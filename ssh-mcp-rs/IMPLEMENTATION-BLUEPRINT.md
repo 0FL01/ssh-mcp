@@ -89,8 +89,8 @@ ssh-mcp-rs/
 
 ### Задачи
 
-- [ ] **2.1** Создать `src/ssh/mod.rs` — модуль SSH
-- [ ] **2.2** Создать `src/ssh/config.rs`:
+- [x] **2.1** Создать `src/ssh/mod.rs` — модуль SSH
+- [x] **2.2** Создать `src/ssh/config.rs`:
   ```rust
   pub struct SshConfig {
       pub host: String,
@@ -102,10 +102,10 @@ ssh-mcp-rs/
       pub sudo_password: Option<String>,
   }
   ```
-- [ ] **2.3** Создать `src/ssh/handler.rs`:
+- [x] **2.3** Создать `src/ssh/handler.rs`:
   - Implement `russh::client::Handler` trait
   - `check_server_key()` — принимать все ключи (или проверять fingerprint)
-- [ ] **2.4** Создать `src/ssh/connection.rs`:
+- [x] **2.4** Создать `src/ssh/connection.rs`:
   ```rust
   pub struct SshConnectionManager {
       config: SshConfig,
