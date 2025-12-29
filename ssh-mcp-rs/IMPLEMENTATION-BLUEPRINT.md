@@ -146,12 +146,12 @@ ssh-mcp-rs/
 
 ### Задачи
 
-- [ ] **3.1** Создать `src/ssh/sanitize.rs`:
+- [x] **3.1** Создать `src/ssh/sanitize.rs`:
   ```rust
   pub fn sanitize_command(command: &str, max_chars: Option<usize>) -> Result<String, SshMcpError>;
   pub fn escape_command_for_shell(command: &str) -> String;
   ```
-- [ ] **3.2** Создать `src/ssh/command.rs`:
+- [x] **3.2** Создать `src/ssh/command.rs`:
   ```rust
   pub struct CommandOutput {
       pub stdout: String,
@@ -167,8 +167,8 @@ ssh-mcp-rs/
       ) -> Result<CommandOutput, SshMcpError>;
   }
   ```
-- [ ] **3.3** Реализовать timeout через `tokio::time::timeout`
-- [ ] **3.4** Graceful abort: при timeout отправлять `pkill -f 'command'`
+- [x] **3.3** Реализовать timeout через `tokio::time::timeout`
+- [x] **3.4** Graceful abort: при timeout отправлять `pkill -f 'command'`
 
 ### Алгоритм exec_command
 
@@ -180,6 +180,25 @@ ssh-mcp-rs/
 5. Обработать ChannelMsg::ExitStatus
 6. timeout → pkill + reject
 ```
+
+### Результат фазы
+
+✅ **Завершено**: Созданы модули для выполнения команд:
+
+- `src/ssh/sanitize.rs`:
+  - `sanitize_command()` — валидация и нормализация команд
+  - `escape_command_for_shell()` — экранирование для shell (pkill)
+  - 10 unit-тестов + 2 doc-теста
+  
+- `src/ssh/command.rs`:
+  - `CommandOutput` struct с полями stdout/stderr/exit_code
+  - `exec_command()` — основной метод выполнения команд
+  - `exec_via_su_shell()` — выполнение через PTY shell (su)
+  - `exec_via_channel()` — стандартное выполнение через exec
+  - `abort_command()` — graceful abort через pkill при timeout
+  - 6 unit-тестов
+
+- Обновлены экспорты в `ssh/mod.rs` и `lib.rs`
 
 ---
 

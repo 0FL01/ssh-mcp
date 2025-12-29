@@ -3,11 +3,15 @@
 //! This module provides persistent SSH connection handling with automatic
 //! reconnection, authentication, and session management.
 
+pub mod command;
 pub mod config;
 pub mod connection;
 pub mod handler;
+pub mod sanitize;
 
 // Re-exports
+pub use command::CommandOutput;
 pub use config::SshConfig;
 pub use connection::SshConnectionManager;
 pub use handler::SshHandler;
+pub use sanitize::{escape_command_for_shell, sanitize_command};

@@ -25,4 +25,7 @@ pub mod ssh;
 // Re-exports for convenience
 pub use config::{Args, Config};
 pub use error::{Result, SshMcpError};
-pub use ssh::{SshConfig, SshConnectionManager, SshHandler};
+pub use ssh::{
+    escape_command_for_shell, sanitize_command, CommandOutput, SshConfig, SshConnectionManager,
+    SshHandler,
+};

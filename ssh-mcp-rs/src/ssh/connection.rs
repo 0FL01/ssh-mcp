@@ -37,7 +37,8 @@ pub struct SshConnectionManager {
     is_connecting: AtomicBool,
 
     /// Elevated shell channel (when using su)
-    su_channel: Arc<Mutex<Option<Channel<client::Msg>>>>,
+    /// Made pub(crate) to allow access from command.rs
+    pub(crate) su_channel: Arc<Mutex<Option<Channel<client::Msg>>>>,
 
     /// Flag indicating whether we're running as root via su
     is_elevated: AtomicBool,
