@@ -2,6 +2,17 @@
 
 > **Цель**: Портирование TypeScript MCP сервера на Rust с использованием `rmcp` SDK и `russh` SSH библиотеки.
 
+## 📊 Статус реализации
+
+| Фаза | Статус | Описание |
+|------|--------|----------|
+| Phase 1 | ✅ Завершено | Project Setup and Basic Structure |
+| Phase 2 | ✅ Завершено | SSH Connection Manager |
+| Phase 3 | ✅ Завершено | Command Execution |
+| Phase 4 | ✅ Завершено | su/sudo Elevation |
+| Phase 5 | ✅ Завершено | MCP Tools Integration |
+| Phase 6 | ⏳ В ожидании | Testing and Verification |
+
 ---
 
 ## Технологический стек
@@ -297,41 +308,65 @@ fn wrap_sudo_command(command: &str, password: Option<&str>) -> String {
 
 ### Задачи
 
-- [ ] **5.1** Создать `src/tools/mod.rs`
-- [ ] **5.2** Создать `src/tools/exec.rs`:
-  ```rust
-  use rmcp::{tool, tool_router, handler::server::tool::ToolRouter};
-
-  #[tool_router]
-  impl SshMcpServer {
-      #[tool(description = "Execute a shell command on the remote SSH server")]
-      async fn exec(&self, command: String) -> Result<CallToolResult, McpError> {
-          let sanitized = sanitize_command(&command, self.config.max_chars)?;
-          let output = self.connection.exec_command(&sanitized, self.timeout).await?;
-          Ok(CallToolResult::success(vec![Content::text(output.stdout)]))
-      }
-  }
-  ```
-- [ ] **5.3** Создать `src/tools/sudo_exec.rs`:
+- [x] **5.1** Создать `src/tools/mod.rs`
+- [x] **5.2** Реализовать `exec` tool в `src/server.rs`:
+  - Tool definition через `Tool::new()` с JSON schema
+  - Метод `execute_command()` для выполнения команд
+  - Sanitization и error handling
+- [x] **5.3** Реализовать `sudo-exec` tool:
   - Условная регистрация (если не `--disable-sudo`)
-  - sudo wrapping с паролем
-- [ ] **5.4** Создать `src/server.rs`:
-  ```rust
-  pub struct SshMcpServer {
-      config: Config,
-      connection: Arc<SshConnectionManager>,
-      tool_router: ToolRouter<Self>,
-  }
-
-  impl ServerHandler for SshMcpServer {
-      // ... implement required methods
-  }
-  ```
-- [ ] **5.5** Обновить `src/main.rs`:
-  - Parse CLI args
+  - sudo wrapping через `wrap_sudo_command()`
+  - Метод `execute_sudo_command()` для выполнения sudo команд
+- [x] **5.4** Создать `src/server.rs`:
+  - `SshMcpServer` struct с config, connection, timeout, max_chars
+  - Реализация `ServerHandler` trait с `get_info()`, `list_tools()`, `call_tool()`
+  - Graceful shutdown через `shutdown()` метод
+- [x] **5.5** Обновить `src/main.rs`:
+  - Parse CLI args через clap
   - Create SshMcpServer
-  - Start stdio transport с `server.serve(stdio()).await`
-  - Graceful shutdown (SIGINT, SIGTERM)
+  - Start stdio transport с `server.serve(rmcp::transport::io::stdio()).await`
+  - Graceful shutdown (SIGINT, SIGTERM) через tokio signals
+
+### Результат фазы
+
+✅ **Завершено**: Полная интеграция MCP tools:
+
+- `src/tools/mod.rs`:
+  - `ExecParams` и `SudoExecParams` structs для JSON schema
+  - 2 unit-теста для deserialize
+  
+- `src/server.rs`:
+  - `SshMcpServer` struct — основной MCP сервер
+  - `ServerHandler` implementation:
+    - `get_info()` — возвращает ServerInfo с версией и capabilities
+    - `list_tools()` — список доступных tools (exec + sudo-exec если enabled)
+    - `call_tool()` — роутинг вызовов к execute_command/execute_sudo_command
+  - `exec_tool()` / `sudo_exec_tool()` — Tool definitions с JSON schema
+  - `execute_command()` — выполнение команд через SSH
+  - `execute_sudo_command()` — выполнение команд с sudo
+  - 3 unit-теста
+  
+- `src/main.rs`:
+  - Полная интеграция с MCP server
+  - stdio transport
+  - Graceful shutdown с SIGINT/SIGTERM
+  
+- `src/lib.rs`:
+  - Обновлённые экспорты: `SshMcpServer`, `ExecParams`, `SudoExecParams`
+
+### Архитектурные решения
+
+1. **Отказ от tool_router macro**: Вместо использования `#[tool_router]` на отдельных классах,
+   tools реализованы непосредственно в `ServerHandler::call_tool()`. Это упрощает код и 
+   избегает проблем с trait bounds.
+
+2. **Tool definitions**: Используется `Tool::new()` метод с `Arc<JsonObject>` для input schema,
+   что соответствует API rmcp 0.12.
+
+3. **Error handling**: Все ошибки возвращаются как `CallToolResult::error()` вместо 
+   `Err(McpError)`, что соответствует TypeScript реализации (ошибки не прерывают сессию).
+
+
 
 ---
 
@@ -383,31 +418,31 @@ fn wrap_sudo_command(command: &str, password: Option<&str>) -> String {
 ```
 ssh-mcp-rs/
 ├── Cargo.toml
+├── IMPLEMENTATION-BLUEPRINT.md
 ├── Docs/
 │   ├── rmcp-sdk.md
 │   └── russh-library.md
 ├── src/
-│   ├── main.rs
-│   ├── lib.rs
-│   ├── config.rs
-│   ├── error.rs
-│   ├── server.rs
+│   ├── main.rs          # Entry point, CLI parsing, MCP server startup
+│   ├── lib.rs           # Re-exports for library usage
+│   ├── config.rs        # Config/Args structs, validation
+│   ├── error.rs         # SshMcpError enum
+│   ├── server.rs        # SshMcpServer, ServerHandler impl
 │   ├── ssh/
-│   │   ├── mod.rs
-│   │   ├── config.rs
-│   │   ├── handler.rs
-│   │   ├── connection.rs
-│   │   ├── command.rs
-│   │   ├── elevation.rs
-│   │   └── sanitize.rs
+│   │   ├── mod.rs       # SSH module exports
+│   │   ├── config.rs    # SshConfig struct
+│   │   ├── handler.rs   # SshHandler (russh client::Handler)
+│   │   ├── connection.rs # SshConnectionManager
+│   │   ├── command.rs   # Command execution, CommandOutput
+│   │   ├── elevation.rs # su/sudo utilities
+│   │   └── sanitize.rs  # Command sanitization
 │   └── tools/
-│       ├── mod.rs
-│       ├── exec.rs
-│       └── sudo_exec.rs
-└── tests/
+│       └── mod.rs       # ExecParams, SudoExecParams (tools in server.rs)
+└── tests/               # (Phase 6)
     ├── unit.rs
     └── integration.rs
 ```
+
 
 ---
 

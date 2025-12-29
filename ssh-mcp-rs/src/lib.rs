@@ -6,26 +6,42 @@
 //!
 //! # Features
 //!
-//! - Execute shell commands on remote SSH servers
-//! - Support for `sudo` command execution with password
+//! - Execute shell commands on remote SSH servers (`exec` tool)
+//! - Support for `sudo` command execution with password (`sudo-exec` tool)
 //! - Persistent SSH connection with auto-reconnect
 //! - Configurable command timeout
 //! - Command length limits for safety
+//!
+//! # MCP Tools
+//!
+//! - `exec` - Execute a shell command on the remote SSH server
+//! - `sudo-exec` - Execute a command with sudo privileges (can be disabled with `--disable-sudo`)
 //!
 //! # Example Usage (CLI)
 //!
 //! ```bash
 //! ssh-mcp --host=192.168.1.100 --user=admin --password=secret
 //! ```
+//!
+//! # Example Usage (MCP Inspector)
+//!
+//! ```bash
+//! npx @modelcontextprotocol/inspector ./target/release/ssh-mcp -- \
+//!   --host=YOUR_HOST --user=root --password=pass
+//! ```
 
 pub mod config;
 pub mod error;
+pub mod server;
 pub mod ssh;
+pub mod tools;
 
 // Re-exports for convenience
 pub use config::{Args, Config};
 pub use error::{Result, SshMcpError};
+pub use server::SshMcpServer;
 pub use ssh::{
     escape_command_for_shell, escape_for_shell, sanitize_command, sanitize_password,
     wrap_sudo_command, CommandOutput, SshConfig, SshConnectionManager, SshHandler,
 };
+pub use tools::{ExecParams, SudoExecParams};
