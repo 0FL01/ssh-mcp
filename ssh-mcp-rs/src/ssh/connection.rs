@@ -155,7 +155,10 @@ impl SshConnectionManager {
             debug!("su_password configured, attempting elevation...");
             if let Err(e) = self.ensure_elevated().await {
                 // Don't fail connection if elevation fails, just log it
-                warn!("Failed to elevate to root: {}. Commands will run as normal user.", e);
+                warn!(
+                    "Failed to elevate to root: {}. Commands will run as normal user.",
+                    e
+                );
             }
         }
 
@@ -166,7 +169,10 @@ impl SshConnectionManager {
     async fn authenticate(&self, session: &mut Handle<SshHandler>) -> Result<()> {
         // Try password authentication first
         if let Some(ref password) = self.config.password {
-            debug!("Attempting password authentication for user '{}'", self.config.username);
+            debug!(
+                "Attempting password authentication for user '{}'",
+                self.config.username
+            );
             let auth_result = session
                 .authenticate_password(&self.config.username, password)
                 .await
@@ -182,7 +188,10 @@ impl SshConnectionManager {
 
         // Try key authentication
         if let Some(ref key_content) = self.config.private_key {
-            debug!("Attempting key authentication for user '{}'", self.config.username);
+            debug!(
+                "Attempting key authentication for user '{}'",
+                self.config.username
+            );
 
             // Parse the private key using russh::keys
             let key = russh::keys::PrivateKey::from_openssh(key_content.as_bytes())
@@ -224,7 +233,7 @@ impl SshConnectionManager {
     }
 
     /// Get a reference to the session for operations
-    /// 
+    ///
     /// Instead of cloning the Handle (which doesn't implement Clone),
     /// we provide methods that work with the session directly.
     pub async fn with_session<F, T>(&self, f: F) -> Result<T>
@@ -291,12 +300,16 @@ impl SshConnectionManager {
         }
 
         // Need su_password
-        let su_password = self.config.su_password.clone().ok_or_else(|| {
-            SshMcpError::elevation_failed("No su_password configured")
-        })?;
+        let su_password = self
+            .config
+            .su_password
+            .clone()
+            .ok_or_else(|| SshMcpError::elevation_failed("No su_password configured"))?;
 
         // Open a channel for PTY shell
-        let channel = self.open_channel().await
+        let channel = self
+            .open_channel()
+            .await
             .map_err(|e| SshMcpError::elevation_failed(format!("Failed to open channel: {}", e)))?;
 
         debug!("Opened channel for su elevation");
@@ -304,13 +317,13 @@ impl SshConnectionManager {
         // Request PTY
         channel
             .request_pty(
-                true,   // want_reply
+                true, // want_reply
                 "xterm",
-                80,     // cols
-                24,     // rows
-                0,      // pixel width
-                0,      // pixel height
-                &[],    // terminal modes
+                80,  // cols
+                24,  // rows
+                0,   // pixel width
+                0,   // pixel height
+                &[], // terminal modes
             )
             .await
             .map_err(|e| SshMcpError::elevation_failed(format!("Failed to request PTY: {}", e)))?;
@@ -318,23 +331,19 @@ impl SshConnectionManager {
         debug!("PTY requested");
 
         // Request shell
-        channel
-            .request_shell(true)
-            .await
-            .map_err(|e| SshMcpError::elevation_failed(format!("Failed to request shell: {}", e)))?;
+        channel.request_shell(true).await.map_err(|e| {
+            SshMcpError::elevation_failed(format!("Failed to request shell: {}", e))
+        })?;
 
         debug!("Shell requested, starting su elevation...");
 
         // Send "su -\n" command
-        channel
-            .data(b"su -\n".as_slice())
-            .await
-            .map_err(|e| SshMcpError::elevation_failed(format!("Failed to send su command: {}", e)))?;
+        channel.data(b"su -\n".as_slice()).await.map_err(|e| {
+            SshMcpError::elevation_failed(format!("Failed to send su command: {}", e))
+        })?;
 
         // Wait for password prompt and respond
-        let elevation_result = self
-            .handle_su_elevation(channel, &su_password)
-            .await;
+        let elevation_result = self.handle_su_elevation(channel, &su_password).await;
 
         match elevation_result {
             Ok(elevated_channel) => {
@@ -373,11 +382,8 @@ impl SshConnectionManager {
             }
 
             // Wait for messages with timeout
-            let wait_result = tokio::time::timeout(
-                Duration::from_millis(500),
-                channel.wait(),
-            )
-            .await;
+            let wait_result =
+                tokio::time::timeout(Duration::from_millis(500), channel.wait()).await;
 
             match wait_result {
                 Ok(Some(msg)) => {
@@ -465,7 +471,7 @@ impl SshConnectionManager {
         // In the TypeScript version, this modifies the config and triggers elevation.
         // For Rust, we'd need interior mutability. For now, just attempt elevation
         // if password is provided.
-        
+
         if password.is_some() {
             // Attempt elevation with the current config
             // In a real implementation, we'd need to update config first

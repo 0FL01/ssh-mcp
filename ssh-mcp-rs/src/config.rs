@@ -221,7 +221,10 @@ mod tests {
 
     #[test]
     fn test_sanitize_password() {
-        assert_eq!(sanitize_password(Some("secret".to_string())), Some("secret".to_string()));
+        assert_eq!(
+            sanitize_password(Some("secret".to_string())),
+            Some("secret".to_string())
+        );
         assert_eq!(sanitize_password(Some("".to_string())), None);
         assert_eq!(sanitize_password(None), None);
     }

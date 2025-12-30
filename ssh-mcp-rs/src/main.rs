@@ -28,10 +28,7 @@ async fn main() -> Result<()> {
     // Validate and create config
     let config = Config::from_args(args)?;
 
-    info!(
-        "SSH MCP Server v{} starting...",
-        env!("CARGO_PKG_VERSION")
-    );
+    info!("SSH MCP Server v{} starting...", env!("CARGO_PKG_VERSION"));
     info!(
         "Connecting to {}@{}:{}",
         config.user, config.host, config.port

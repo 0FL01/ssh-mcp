@@ -156,7 +156,10 @@ mod tests {
 
     #[test]
     fn test_escape_for_shell_multiple_quotes() {
-        assert_eq!(escape_for_shell("'a' and 'b'"), "'\"'\"'a'\"'\"' and '\"'\"'b'\"'\"'");
+        assert_eq!(
+            escape_for_shell("'a' and 'b'"),
+            "'\"'\"'a'\"'\"' and '\"'\"'b'\"'\"'"
+        );
     }
 
     #[test]
@@ -170,8 +173,14 @@ mod tests {
 
     #[test]
     fn test_sanitize_password() {
-        assert_eq!(sanitize_password(Some("secret")), Some("secret".to_string()));
-        assert_eq!(sanitize_password(Some("  secret  ")), Some("secret".to_string()));
+        assert_eq!(
+            sanitize_password(Some("secret")),
+            Some("secret".to_string())
+        );
+        assert_eq!(
+            sanitize_password(Some("  secret  ")),
+            Some("secret".to_string())
+        );
         assert_eq!(sanitize_password(Some("")), None);
         assert_eq!(sanitize_password(Some("   ")), None);
         assert_eq!(sanitize_password(None), None);

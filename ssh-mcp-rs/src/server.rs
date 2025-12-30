@@ -94,7 +94,10 @@ impl SshMcpServer {
     }
 
     /// Execute a command (used by exec tool)
-    async fn execute_command(&self, command: &str) -> std::result::Result<CallToolResult, McpError> {
+    async fn execute_command(
+        &self,
+        command: &str,
+    ) -> std::result::Result<CallToolResult, McpError> {
         debug!("exec tool called with command: {}", command);
 
         // Sanitize the command

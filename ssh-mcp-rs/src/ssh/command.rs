@@ -95,7 +95,9 @@ impl SshConnectionManager {
         // Take the channel from the mutex (we'll put it back after)
         let mut channel = {
             let mut guard = self.su_channel.lock().await;
-            guard.take().ok_or_else(|| SshMcpError::connection("No su channel available"))?
+            guard
+                .take()
+                .ok_or_else(|| SshMcpError::connection("No su channel available"))?
         };
 
         // Send command
@@ -103,7 +105,10 @@ impl SshConnectionManager {
             // Put channel back before returning error
             let mut guard = self.su_channel.lock().await;
             *guard = Some(channel);
-            return Err(SshMcpError::connection(format!("Failed to send command: {}", e)));
+            return Err(SshMcpError::connection(format!(
+                "Failed to send command: {}",
+                e
+            )));
         }
 
         // Collect output until we see a root prompt (#)
@@ -115,11 +120,8 @@ impl SshConnectionManager {
                 break Err(SshMcpError::Timeout(timeout_duration.as_millis() as u64));
             }
 
-            let wait_result = tokio::time::timeout(
-                Duration::from_millis(500),
-                channel.wait(),
-            )
-            .await;
+            let wait_result =
+                tokio::time::timeout(Duration::from_millis(500), channel.wait()).await;
 
             match wait_result {
                 Ok(Some(msg)) => {
@@ -198,11 +200,7 @@ impl SshConnectionManager {
             .map_err(|e| SshMcpError::connection(format!("Failed to exec command: {}", e)))?;
 
         // Collect output with timeout
-        let result = timeout(
-            timeout_duration,
-            self.collect_channel_output(channel),
-        )
-        .await;
+        let result = timeout(timeout_duration, self.collect_channel_output(channel)).await;
 
         match result {
             Ok(output) => output,
