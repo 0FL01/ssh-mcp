@@ -2,11 +2,11 @@
 name = "ssh-mcp"
 version = "1.4.0"
 edition = "2021"
-authors = ["tufantunc"]
+authors = ["0FL01"]
 description = "MCP server exposing SSH control for Linux systems via Model Context Protocol"
 license = "MIT"
-repository = "https://github.com/tufantunc/ssh-mcp"
-homepage = "https://github.com/tufantunc/ssh-mcp#readme"
+repository = "https://github.com/0FL01/ssh-mcp-rs"
+homepage = "https://github.com/0FL01/ssh-mcp-rs#readme"
 keywords = ["ssh", "mcp", "model-context-protocol", "server", "linux", "automation", "remote", "cli"]
 
 [[bin]]
@@ -19,7 +19,6 @@ rmcp = { version = "0.12", features = ["server", "transport-io"] }
 
 # SSH
 russh = "0.56"
-ssh-key = { version = "0.6", features = ["std"] }
 
 # Async runtime
 tokio = { version = "1", features = ["full", "signal"] }
@@ -35,9 +34,6 @@ anyhow = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 schemars = "0.8"
-
-# Async utilities
-async-trait = "0.1"
 
 # Tracing/Logging
 tracing = "0.1"

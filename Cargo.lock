@@ -1535,7 +1535,7 @@ dependencies = [
  "p384",
  "p521",
  "rand_core 0.6.4",
- "rsa 0.10.0-rc.10",
+ "rsa",
  "sec1",
  "sha1 0.10.6",
  "sha1 0.11.0-rc.3",
@@ -1793,7 +1793,6 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "smallvec",
- "zeroize",
 ]
 
 [[package]]
@@ -1829,7 +1828,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841"
 dependencies = [
  "autocfg",
- "libm",
 ]
 
 [[package]]
@@ -2029,17 +2027,6 @@ name = "pin-utils"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
-
-[[package]]
-name = "pkcs1"
-version = "0.7.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8ffb9f10fa047879315e6625af03c164b16962a5368d724ed16323b68ace47f"
-dependencies = [
- "der 0.7.10",
- "pkcs8 0.10.2",
- "spki 0.7.3",
-]
 
 [[package]]
 name = "pkcs1"
@@ -2392,27 +2379,6 @@ dependencies = [
 
 [[package]]
 name = "rsa"
-version = "0.9.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40a0376c50d0358279d9d643e4bf7b7be212f1f4ff1da9070a7b54d22ef75c88"
-dependencies = [
- "const-oid 0.9.6",
- "digest 0.10.7",
- "num-bigint-dig",
- "num-integer",
- "num-traits",
- "pkcs1 0.7.5",
- "pkcs8 0.10.2",
- "rand_core 0.6.4",
- "sha2 0.10.9",
- "signature 2.2.0",
- "spki 0.7.3",
- "subtle",
- "zeroize",
-]
-
-[[package]]
-name = "rsa"
 version = "0.10.0-rc.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e499c52862d75a86c0024cc99dcb6d7127d15af3beae7b03573d62fab7ade08a"
@@ -2421,7 +2387,7 @@ dependencies = [
  "crypto-bigint 0.7.0-rc.10",
  "crypto-primes",
  "digest 0.11.0-rc.5",
- "pkcs1 0.8.0-rc.4",
+ "pkcs1",
  "pkcs8 0.11.0-rc.8",
  "rand_core 0.10.0-rc-3",
  "sha2 0.11.0-rc.3",
@@ -2472,12 +2438,12 @@ dependencies = [
  "p521",
  "pageant",
  "pbkdf2",
- "pkcs1 0.8.0-rc.4",
+ "pkcs1",
  "pkcs5",
  "pkcs8 0.10.2",
  "rand 0.8.5",
  "rand_core 0.6.4",
- "rsa 0.10.0-rc.10",
+ "rsa",
  "russh-cryptovec",
  "russh-util",
  "sec1",
@@ -3038,38 +3004,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "ssh-key"
-version = "0.6.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b86f5297f0f04d08cabaa0f6bff7cb6aec4d9c3b49d87990d63da9d9156a8c3"
-dependencies = [
- "p256",
- "p384",
- "p521",
- "rand_core 0.6.4",
- "rsa 0.9.9",
- "sec1",
- "sha2 0.10.9",
- "signature 2.2.0",
- "ssh-cipher",
- "ssh-encoding",
- "subtle",
- "zeroize",
-]
-
-[[package]]
 name = "ssh-mcp"
 version = "1.4.0"
 dependencies = [
  "anyhow",
- "async-trait",
  "clap",
  "rmcp",
  "russh",
  "schemars 0.8.22",
  "serde",
  "serde_json",
- "ssh-key",
  "testcontainers",
  "thiserror 2.0.17",
  "tokio",
