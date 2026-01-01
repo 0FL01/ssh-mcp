@@ -117,5 +117,4 @@ jobs:
           gh release create rolling \
             --title "Rolling Release (${{ env.SHORT_SHA }})" \
             --notes "Latest rolling build from commit ${{ env.SHORT_SHA }}. Built from branch \`main\`." \
-            --prune \
             artifacts/*/*
